@@ -1,7 +1,10 @@
 package org.sid.bank_account_service.web;
 
+import org.sid.bank_account_service.dtos.BankAccountDTOResponse;
+import org.sid.bank_account_service.dtos.BankAccountRequestDTO;
 import org.sid.bank_account_service.entities.BankAccount;
 import org.sid.bank_account_service.repositories.BankAccountRepositorie;
+import org.sid.bank_account_service.service.AccountService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
@@ -13,10 +16,14 @@ public class AccountRestController {
 
 
     private BankAccountRepositorie bankAccountRepositorie;
+    private AccountService accountService;
 
-    public AccountRestController(BankAccountRepositorie bankAccountRepositorie) {
+    public AccountRestController(BankAccountRepositorie bankAccountRepositorie , AccountService accountService) {
         this.bankAccountRepositorie = bankAccountRepositorie;
+        this.accountService = accountService;
     }
+
+
 
     @GetMapping("/bankAccounts")
     public List<BankAccount> bankAccounts() {
@@ -38,24 +45,26 @@ public class AccountRestController {
     }
 
     @PutMapping("/bankAccounts/{id}")
-    public BankAccount update(@PathVariable String id, @RequestBody BankAccount bankAccount) {
-        // 1. Charger l'entité existante depuis la BDD (état 'Managed' par JPA)
-        BankAccount account = bankAccountRepositorie.findById(id)
-                .orElseThrow(() -> new RuntimeException(String.format("Account %s not found", id)));
+    public BankAccountDTOResponse update(@PathVariable String id, @RequestBody BankAccountRequestDTO bankAccountDTO) {
+//        // 1. Charger l'entité existante depuis la BDD (état 'Managed' par JPA)
+//        BankAccount account = bankAccountRepositorie.findById(id)
+//                .orElseThrow(() -> new RuntimeException(String.format("Account %s not found", id)));
+//
+//        // 2. Modifier UNIQUEMENT si la valeur reçue dans la requête n'est pas null
+//        if (bankAccount.getBalance() != null) {
+//            account.setBalance(bankAccount.getBalance());
+//        }
+//        if (bankAccount.getCurrency() != null) {
+//            account.setCurrency(bankAccount.getCurrency());
+//        }
+//        if (bankAccount.getType() != null) {
+//            account.setType(bankAccount.getType());
+//        }
+//
+//        // 3. Sauvegarder
+//        return bankAccountRepositorie.save(account);
+        return accountService.updateAccount(id,bankAccountDTO);
 
-        // 2. Modifier UNIQUEMENT si la valeur reçue dans la requête n'est pas null
-        if (bankAccount.getBalance() != null) {
-            account.setBalance(bankAccount.getBalance());
-        }
-        if (bankAccount.getCurrency() != null) {
-            account.setCurrency(bankAccount.getCurrency());
-        }
-        if (bankAccount.getType() != null) {
-            account.setType(bankAccount.getType());
-        }
-
-        // 3. Sauvegarder
-        return bankAccountRepositorie.save(account);
     }
 
     @DeleteMapping("/bankAccounts/{id}")
